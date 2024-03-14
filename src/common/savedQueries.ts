@@ -1,9 +1,9 @@
 const key = 'savedQueries';
 
-export function addQuery(queryData: { queryText: string; name: string }) {
+export function addQuery(queryData: { queryText: string; name: string; dbName: string }) {
     const id = Date.now();
     const queries = getQueries();
-    queries[id] = { queryText: queryData.queryText, name: queryData.name };
+    queries[id] = { queryText: queryData.queryText, name: queryData.name, dbName: queryData.dbName };
     localStorage.setItem(key, JSON.stringify(queries));
 }
 
@@ -18,7 +18,7 @@ export function getQueries() {
     }
 }
 
-export function updateQuery(queryData: { id: string; queryText: string; name: string }) {
+export function updateQuery(queryData: { id: string; queryText: string; name: string; dbName: string }) {
     const queries = getQueries();
     queries[queryData.id] = queryData;
     localStorage.setItem(key, JSON.stringify(queries));

@@ -92,8 +92,9 @@ export default class QueryView extends Vue {
         if (this.queryName?.length && this.query?.length) {
             const queryId = this.$route.params.queryId;
             const queryData = getQueryById(queryId);
-            if (queryData) updateQuery({ id: queryId, queryText: this.query, name: this.queryName });
-            else addQuery({ queryText: this.query, name: this.queryName });
+            if (queryData)
+                updateQuery({ id: queryId, queryText: this.query, name: this.queryName, dbName: this.selectedDb });
+            else addQuery({ queryText: this.query, name: this.queryName, dbName: this.selectedDb });
             this.queryNameHeading = `Saved Query Name : ${this.queryName}`;
             this.$modal.hide('save-query');
             this.infoMessage = 'Added Successfully';
@@ -119,6 +120,7 @@ export default class QueryView extends Vue {
         const queryData = getQueryById(queryId);
         if (queryId && queryData) {
             this.queryName = queryData.name;
+            this.selectedDb = queryData.dbName;
             this.queryNameHeading = `Saved Query Name : ${queryData.name}`;
             this.query = queryData.queryText;
         }
