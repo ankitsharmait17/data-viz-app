@@ -6,7 +6,7 @@
             </div>
             <div class="query-results-control">
                 <div class="query-results-control-total">Total Rows : {{ queryResults.data.length }}</div>
-                <div class="query-results-control-export"><button @click="exportToCSV">Export to CSV</button></div>
+                <div class="query-results-control-export"><button @click="sendJsonToWorker">Export to CSV</button></div>
             </div>
             <div class="table-header">
                 <div v-for="(column, index) in queryResults.columns" :key="index" class="table-cell" v-tooltip="column">
@@ -45,18 +45,34 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { QueryResponse } from '@/common/types';
 import { RecycleScroller } from 'vue-virtual-scroller';
 import VTooltip from 'v-tooltip';
-import { truncateText, convertToCSV } from '@/common/utils';
+import { truncateText } from '@/common/utils';
+
+const worker = new Worker('/csvWorker.js');
 
 @Component({ name: 'QueryResults', components: { RecycleScroller, VTooltip }, methods: { truncateText } })
 export default class QueryResults extends Vue {
     @Prop() queryResults!: QueryResponse;
 
-    exportToCSV() {
-        const csvContent = convertToCSV(this.queryResults);
+    mounted() {
+        worker.onmessage = (event) => {
+            const csvContent = event.data;
+            this.exportToCSV(csvContent);
+        };
+    }
+
+    sendJsonToWorker() {
+        worker.postMessage({ message: 'downloadCsv', queryResults: this.queryResults });
+    }
+
+    exportToCSV(csvContent: Blob) {
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(csvContent);
         link.download = `data_${Date.now()}.csv`;
         link.click();
+    }
+
+    destroyed() {
+        worker.terminate(); // Terminate the worker after use
     }
 }
 </script>
