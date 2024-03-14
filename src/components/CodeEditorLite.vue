@@ -1,46 +1,52 @@
 <template>
     <div>
-        <div class="code-editor-new-query">
-            <div class="code-editor-new-query-label">New Query</div>
-            <div class="code-editor-new-query-save"><button>Save</button></div>
-        </div>
         <div class="code-editor-lite">
             <div class="code-editor-lite-char-count">Character Count : {{ charCount }}/3000</div>
             <div class="code-editor-lite-input">
                 <textarea
                     id="code-editor-lite-input-text"
                     maxlength="3000"
-                    v-model="query"
+                    :value="value"
                     rows="4"
                     cols="50"
-                    placeholder="Enter your SQL query here..."
+                    placeholder="Enter your SQL value here..."
                     @change="onQueryUpdate"
+                    @input="handleInput"
                 ></textarea>
                 <button class="code-editor-lite-input-run" @click="runQuery">Run</button>
+                <button class="code-editor-lite-input-clear" @click="clearQuery">Clear</button>
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Prop } from 'vue-property-decorator';
 
 @Component({ name: 'CodeEditorLite' })
 export default class CodeEditorLite extends Vue {
-    query = '';
+    @Prop() value!: string;
     isQueryUpdated = false;
 
     get charCount() {
-        return this.query?.length || 0;
+        return this.value?.length || 0;
     }
 
     onQueryUpdate() {
         this.isQueryUpdated = true;
     }
 
+    handleInput(e: any) {
+        this.$emit('input', e.target.value);
+    }
+
+    clearQuery() {
+        this.$emit('clear-query');
+    }
+
     runQuery() {
-        if (this.query.length) {
-            this.$emit('run-query', { query: this.query, isQueryUpdated: this.isQueryUpdated });
+        if (this.value.length) {
+            this.$emit('run-query', { query: this.value, isQueryUpdated: this.isQueryUpdated });
             this.isQueryUpdated = false;
         }
     }
@@ -57,7 +63,7 @@ export default class CodeEditorLite extends Vue {
         position: relative;
         textarea {
             width: calc(100% - 20px);
-            height: 200px;
+            height: 100px;
             padding: 10px;
             font-size: 16px;
             font-family: monospace;
@@ -67,7 +73,15 @@ export default class CodeEditorLite extends Vue {
         }
         &-run {
             position: absolute;
-            top: 50%;
+            top: 20%;
+            right: 10px;
+            transform: translateY(-50%);
+            margin-top: 10px;
+            @include button();
+        }
+        &-clear {
+            position: absolute;
+            top: 60%;
             right: 10px;
             transform: translateY(-50%);
             margin-top: 10px;
@@ -77,25 +91,6 @@ export default class CodeEditorLite extends Vue {
     &-char-count {
         font-size: 14px;
         text-align: end;
-    }
-}
-
-.code-editor-new-query {
-    background-color: #f5f5f5;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-radius: 5px;
-    &-label {
-        font-size: 20px;
-        font-weight: bold;
-    }
-    &-save {
-        text-align: end;
-        button {
-            @include button();
-        }
     }
 }
 </style>

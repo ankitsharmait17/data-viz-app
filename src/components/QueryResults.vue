@@ -1,6 +1,13 @@
 <template>
     <div class="query-results">
         <div>
+            <div class="query-results-heading">
+                <h2>Query Results</h2>
+            </div>
+            <div class="query-results-control">
+                <div class="query-results-control-total">Total Rows : {{ queryResults.data.length }}</div>
+                <div class="query-results-control-export"><button @click="exportToCSV">Export to CSV</button></div>
+            </div>
             <div class="table-header">
                 <div v-for="(column, index) in queryResults.columns" :key="index" class="table-cell" v-tooltip="column">
                     {{ column }}
@@ -8,6 +15,7 @@
             </div>
 
             <recycle-scroller
+                v-if="queryResults.data.length"
                 class="table-body"
                 :items="queryResults.data"
                 :item-size="50"
@@ -27,6 +35,7 @@
                     </div>
                 </div>
             </recycle-scroller>
+            <div class="query-results-error" v-else>Sorry! No Results for this query.</div>
         </div>
     </div>
 </template>
@@ -36,15 +45,18 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import { QueryResponse } from '@/common/types';
 import { RecycleScroller } from 'vue-virtual-scroller';
 import VTooltip from 'v-tooltip';
+import { truncateText, convertToCSV } from '@/common/utils';
 
-const maxlength = 80;
-
-@Component({ name: 'QueryResults', components: { RecycleScroller, VTooltip } })
+@Component({ name: 'QueryResults', components: { RecycleScroller, VTooltip }, methods: { truncateText } })
 export default class QueryResults extends Vue {
     @Prop() queryResults!: QueryResponse;
 
-    truncateText(text: string) {
-        return text.length > maxlength ? `${text.slice(0, maxlength)}...` : text;
+    exportToCSV() {
+        const csvContent = convertToCSV(this.queryResults);
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(csvContent);
+        link.download = `data_${Date.now()}.csv`;
+        link.click();
     }
 }
 </script>
@@ -55,7 +67,30 @@ export default class QueryResults extends Vue {
 
 <style lang="scss">
 @import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+@import '@/scss/mixins';
+
 .query-results {
+    &-error {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 50px;
+    }
+
+    &-control {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        margin-top: 10px;
+        &-total {
+            font-weight: bold;
+        }
+        button {
+            @include button();
+        }
+    }
+
     .table-header {
         display: flex;
         font-weight: bold;

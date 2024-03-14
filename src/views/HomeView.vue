@@ -1,7 +1,15 @@
 <template>
     <div class="home">
-        <code-editor-lite @run-query="runQuery" />
+        <div class="quer-home">
+            <div class="quer-home-label">New Query</div>
+            <div class="quer-home-save"><button>Save</button></div>
+        </div>
+        <code-editor-lite v-model="query" @run-query="runQuery" @clear-query="clearQuery" />
         <query-results v-if="queryResults" :queryResults="queryResults" />
+        <div class="quer-home-info" v-else-if="!isError">Please type a query above</div>
+        <div class="quer-home-info" v-else-if="isError">
+            The table does not exist on this Database. Please check your query
+        </div>
     </div>
 </template>
 
@@ -9,11 +17,8 @@
 import { Component, Vue } from 'vue-property-decorator';
 import CodeEditorLite from '@/components/CodeEditorLite.vue';
 import QueryResults from '@/components/QueryResults.vue';
-import order_details from '@/mocks/order_details.json';
-import orders from '@/mocks/orders.json';
-import products from '@/mocks/products.json';
-import suppliers from '@/mocks/suppliers.json';
 import { QueryResponse } from '@/common/types';
+import { renderData } from '@/common/utils';
 
 @Component({
     components: {
@@ -22,32 +27,51 @@ import { QueryResponse } from '@/common/types';
     },
 })
 export default class HomeView extends Vue {
+    query = '';
     queryResults: QueryResponse | null = null;
-    random = 0;
+    isError = false;
 
     runQuery(queryInfo: { query: string; isQueryUpdated: boolean }) {
-        this.random++;
-        const index = this.random % 4;
-        let data: QueryResponse | null = null;
+        this.isError = false;
         if (queryInfo.isQueryUpdated) {
-            switch (index) {
-                case 0:
-                    data = order_details;
-                    break;
-                case 1:
-                    data = orders;
-                    break;
-                case 2:
-                    data = products;
-                    break;
-                case 3:
-                    data = suppliers;
-                    break;
-            }
-            if (data) {
-                this.queryResults = data;
-            }
+            let data = renderData(queryInfo.query);
+            if (!data) this.isError = true;
+            this.queryResults = data;
         }
+    }
+
+    clearQuery() {
+        this.query = '';
+        this.queryResults = null;
+        this.isError = false;
     }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '@/scss/mixins';
+.quer-home {
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    &-label {
+        font-size: 20px;
+        font-weight: bold;
+    }
+    &-save {
+        text-align: end;
+        button {
+            @include button();
+        }
+    }
+    &-info {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 50px;
+    }
+}
+</style>
