@@ -1,77 +1,46 @@
 <template>
     <div class="home">
-        <div class="quer-home">
-            <div class="quer-home-label">New Query</div>
-            <div class="quer-home-save"><button>Save</button></div>
-        </div>
-        <code-editor-lite v-model="query" @run-query="runQuery" @clear-query="clearQuery" />
-        <query-results v-if="queryResults" :queryResults="queryResults" />
-        <div class="quer-home-info" v-else-if="!isError">Please type a query above</div>
-        <div class="quer-home-info" v-else-if="isError">
-            The table does not exist on this Database. Please check your query
-        </div>
+        <div class="home-new-query" @click="routeToNewQuery"><div>New Query</div></div>
+        <div class="home-saved-query" @click="routeToSavedQuery"><div>Saved Queries</div></div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import CodeEditorLite from '@/components/CodeEditorLite.vue';
-import QueryResults from '@/components/QueryResults.vue';
-import { QueryResponse } from '@/common/types';
-import { renderData } from '@/common/utils';
 
 @Component({
-    components: {
-        CodeEditorLite,
-        QueryResults,
-    },
+    name: 'HomeView',
+    components: {},
 })
 export default class HomeView extends Vue {
-    query = '';
-    queryResults: QueryResponse | null = null;
-    isError = false;
-
-    runQuery(queryInfo: { query: string; isQueryUpdated: boolean }) {
-        this.isError = false;
-        if (queryInfo.isQueryUpdated) {
-            let data = renderData(queryInfo.query);
-            if (!data) this.isError = true;
-            this.queryResults = data;
-        }
+    routeToNewQuery() {
+        this.$router.push({ name: 'query', params: { queryId: 'new' } });
     }
 
-    clearQuery() {
-        this.query = '';
-        this.queryResults = null;
-        this.isError = false;
+    routeToSavedQuery() {
+        this.$router.push({ name: 'saved-queries' });
     }
 }
 </script>
 
 <style lang="scss" scoped>
-@import '@/scss/mixins';
-.quer-home {
-    background-color: #f5f5f5;
+.home {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 10px;
-    border-radius: 5px;
-    &-label {
-        font-size: 20px;
-        font-weight: bold;
-    }
-    &-save {
-        text-align: end;
-        button {
-            @include button();
-        }
-    }
-    &-info {
-        text-align: center;
-        font-size: 20px;
-        font-weight: bold;
-        margin: 50px;
+    &-new-query,
+    &-saved-query {
+        height: 200px;
+        width: 200px;
+        border: 1px solid black;
+        border-radius: 5px;
+        margin: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #42b983;
+        cursor: pointer;
+        color: white;
     }
 }
 </style>
