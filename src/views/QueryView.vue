@@ -14,6 +14,9 @@
                     <option v-for="db in Object.keys(DATABASES)" :key="db" :value="db">{{ db }}</option>
                 </select>
             </label>
+            <p v-if="selectedDb.length > 0">
+                Available tables in {{ selectedDb }} : {{ DATABASES[selectedDb].join(',') }}
+            </p>
         </div>
         <code-editor-lite v-model="query" @run-query="runQuery" @clear-query="clearQuery" />
         <query-results v-if="queryResults" :queryResults="queryResults" />

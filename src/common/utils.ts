@@ -18,14 +18,6 @@ export function renderData(query: string, selectedDb: string) {
     else return null;
 }
 
-export function convertToCSV(queryResults: QueryResponse) {
-    const header = queryResults.columns.join(',');
-    const rows = queryResults.data.map((ar) => Object.values(ar).join(','));
-    const csvContent = `${header}\n${rows.join('\n')}`;
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    return blob;
-}
-
 export function truncateText(text: string, maxlength = 80) {
     return text.length > maxlength ? `${text.slice(0, maxlength)}...` : text;
 }
