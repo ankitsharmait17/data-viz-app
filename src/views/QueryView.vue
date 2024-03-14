@@ -6,6 +6,15 @@
                 <button @click="showSaveQueryModal">Save</button>
             </div>
         </div>
+        <div class="query-home-database">
+            <label>
+                Select a Database * :
+                <select v-model="selectedDb">
+                    <option value="">Select</option>
+                    <option v-for="db in Object.keys(DATABASES)" :key="db" :value="db">{{ db }}</option>
+                </select>
+            </label>
+        </div>
         <code-editor-lite v-model="query" @run-query="runQuery" @clear-query="clearQuery" />
         <query-results v-if="queryResults" :queryResults="queryResults" />
         <div class="query-home-info" v-else-if="!isError">
@@ -16,12 +25,12 @@
         </div>
         <modal name="save-query">
             <div class="query-home-query-form">
-                <label>Name <input type="text" v-model="queryName" /></label>
+                <label>Name * : <input type="text" v-model="queryName" /></label>
                 <button @click="saveQuery">Save</button>
             </div>
         </modal>
         <modal name="save-query-info">
-            <div>{{ infoMessage }}</div>
+            <div class="query-home-query-form">{{ infoMessage }}</div>
         </modal>
     </div>
 </template>
@@ -33,6 +42,7 @@ import QueryResults from '@/components/QueryResults.vue';
 import { QueryResponse } from '@/common/types';
 import { renderData } from '@/common/utils';
 import { addQuery, updateQuery, getQueryById } from '@/common/savedQueries';
+import { DATABASES } from '@/common/constants';
 
 @Component({
     name: 'QueryView',
@@ -48,14 +58,24 @@ export default class QueryView extends Vue {
     queryName = '';
     queryNameHeading = 'New Query';
     infoMessage = '';
+    DATABASES = DATABASES;
+    selectedDb = '';
 
-    runQuery(queryInfo: { query: string; isQueryUpdated: boolean }) {
+    runQuery(queryInfo: { query: string }) {
         this.isError = false;
-        if (queryInfo.isQueryUpdated) {
-            let data = renderData(queryInfo.query);
-            if (!data) this.isError = true;
-            this.queryResults = data;
+        if (this.selectedDb.length === 0) {
+            this.infoMessage = 'Please select the Database';
+            this.$modal.show('save-query-info');
+            return;
         }
+        if (queryInfo.query.length === 0) {
+            this.infoMessage = 'Please enter the query';
+            this.$modal.show('save-query-info');
+            return;
+        }
+        let data = renderData(queryInfo.query, this.selectedDb);
+        if (!data) this.isError = true;
+        this.queryResults = data;
     }
 
     clearQuery() {
@@ -74,7 +94,7 @@ export default class QueryView extends Vue {
             const queryData = getQueryById(queryId);
             if (queryData) updateQuery({ id: queryId, queryText: this.query, name: this.queryName });
             else addQuery({ queryText: this.query, name: this.queryName });
-            this.queryNameHeading = this.queryName;
+            this.queryNameHeading = `Saved Query Name : ${this.queryName}`;
             this.$modal.hide('save-query');
             this.infoMessage = 'Added Successfully';
             this.$modal.show('save-query-info');
@@ -99,7 +119,7 @@ export default class QueryView extends Vue {
         const queryData = getQueryById(queryId);
         if (queryId && queryData) {
             this.queryName = queryData.name;
-            this.queryNameHeading = queryData.name;
+            this.queryNameHeading = `Saved Query Name : ${queryData.name}`;
             this.query = queryData.queryText;
         }
     }
@@ -108,43 +128,49 @@ export default class QueryView extends Vue {
 
 <style lang="scss" scoped>
 @import '@/scss/mixins';
-.query-home {
-    background-color: #f5f5f5;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-radius: 5px;
-    &-label {
-        font-size: 20px;
-        font-weight: bold;
-    }
-    &-save {
-        text-align: end;
-        button {
-            @include button();
-        }
-    }
-    &-info {
-        text-align: center;
-        font-size: 20px;
-        font-weight: bold;
-        margin: 50px;
-    }
-    &-query-form {
-        height: 250px;
+.query {
+    margin: 0 10px 10px 10px;
+    &-home {
+        background-color: #f5f5f5;
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
         padding: 10px;
         border-radius: 5px;
-        input {
-            height: 35px;
-            margin-right: 10px;
-            border-radius: 5px;
+        &-label {
+            font-size: 20px;
+            font-weight: bold;
         }
-        button {
-            @include button();
+        &-save {
+            text-align: end;
+            button {
+                @include button();
+            }
+        }
+        &-info {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 50px;
+        }
+        &-query-form {
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            input {
+                height: 35px;
+                margin-right: 10px;
+                border-radius: 5px;
+            }
+            button {
+                @include button();
+            }
+        }
+        &-database {
+            margin: 10px;
         }
     }
 }

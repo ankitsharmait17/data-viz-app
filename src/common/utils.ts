@@ -3,10 +3,13 @@ import products from '@/mocks/products.json';
 import suppliers from '@/mocks/suppliers.json';
 import customers from '@/mocks/customers.json';
 import emptyData from '@/mocks/emptyData.json';
-import { TABLES } from './constants';
+import { TABLES, DATABASES } from './constants';
 import { QueryResponse } from './types';
 
-export function renderData(query: string) {
+export function renderData(query: string, selectedDb: string) {
+    const available_tables = DATABASES[selectedDb];
+    const isTablePresent = available_tables.some((table) => query.includes(table));
+    if (!isTablePresent) return null;
     if (query.includes(TABLES.CUSTOMERS)) return customers;
     else if (query.includes(TABLES.ORDERS)) return orders;
     else if (query.includes(TABLES.PRODUCTS)) return products;

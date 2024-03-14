@@ -1,6 +1,8 @@
 <template>
     <div class="saved-query">
         <div v-if="savedQueries && Object.keys(savedQueries).length > 0">
+            <p>The below are the list of saved queries :</p>
+            <p>Clicking on them will redirect you to the queries page.</p>
             <ul>
                 <li
                     class="saved-query-route"
@@ -46,6 +48,7 @@ export default class SavedQueryView extends Vue {
     font-weight: bold;
     &-route {
         cursor: pointer;
+        color: blue;
     }
 }
 </style>

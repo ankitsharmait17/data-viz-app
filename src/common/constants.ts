@@ -6,7 +6,7 @@ export const TABLES = {
     EMPTY_DATA: 'emptyData',
 };
 
-export const DATABASES = {
+export const DATABASES: { [k: string]: string[] } = {
     CUSTOMERS_DB: [TABLES.CUSTOMERS],
     ORDERS_DB: [TABLES.ORDERS, TABLES.PRODUCTS],
     SUPPLIERS_DB: [TABLES.SUPPLIERS],

@@ -10,7 +10,6 @@
                     rows="4"
                     cols="50"
                     placeholder="Enter your SQL value here..."
-                    @change="onQueryUpdate"
                     @input="handleInput"
                 ></textarea>
                 <button class="code-editor-lite-input-run" @click="runQuery">Run</button>
@@ -26,14 +25,9 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 @Component({ name: 'CodeEditorLite' })
 export default class CodeEditorLite extends Vue {
     @Prop() value!: string;
-    isQueryUpdated = false;
 
     get charCount() {
         return this.value?.length || 0;
-    }
-
-    onQueryUpdate() {
-        this.isQueryUpdated = true;
     }
 
     handleInput(e: any) {
@@ -45,10 +39,7 @@ export default class CodeEditorLite extends Vue {
     }
 
     runQuery() {
-        if (this.value.length) {
-            this.$emit('run-query', { query: this.value, isQueryUpdated: this.isQueryUpdated });
-            this.isQueryUpdated = false;
-        }
+        this.$emit('run-query', { query: this.value });
     }
 }
 </script>

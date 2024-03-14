@@ -2,6 +2,7 @@
     <div class="navbar">
         <router-link to="/">Home</router-link> |
         <router-link to="/saved-queries">Saved Queries</router-link>
+        <router-link to="/query/new">New Query</router-link>
     </div>
 </template>
 
@@ -15,7 +16,7 @@ export default class extends Vue {}
 .navbar {
     background-color: #333;
     overflow: hidden;
-    margin-bottom: 50px;
+    margin-bottom: 10px;
 }
 
 .navbar a {
