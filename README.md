@@ -108,6 +108,12 @@ The web vitals have been measured through Lighthouse :
 ![enter image description here](https://i.postimg.cc/8CZDCP1L/Screenshot-2024-03-15-at-12-14-57-PM.png)
 
 
+## Demo link
+
+https://app.gemoo.com/share/home?codeId=DGW12WJdxpR9o
+
+https://app.gemoo.com/share/home?codeId=P57kjaEkjkjYa
+
 ## Project setup
 ```
 npm install
