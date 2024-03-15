@@ -70,10 +70,6 @@ export default class QueryResults extends Vue {
         link.download = `data_${Date.now()}.csv`;
         link.click();
     }
-
-    destroyed() {
-        worker.terminate(); // Terminate the worker after use
-    }
 }
 </script>
 
