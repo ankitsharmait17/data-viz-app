@@ -114,6 +114,11 @@ https://app.gemoo.com/share/home?codeId=DGW12WJdxpR9o
 
 https://app.gemoo.com/share/home?codeId=P57kjaEkjkjYa
 
+## Hosted on
+
+https://data-viz-app-alpha.vercel.app/#/
+
+
 ## Project setup
 ```
 npm install
